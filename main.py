@@ -1,6 +1,13 @@
 from sys import argv
 from sorter import Sorter
 
+#ToDo сделать нормальные аргументы
+#ToDo удаление без rmtree
+#ToDo прогрессбар
+#ToDo возможность указания временной директории
+#ToDo readme
+#ToDo тесты main.py
+
 if __name__ == '__main__':
     if len(argv) == 2 and (argv[1] == "-h" or argv[1] == "--help"):
         print("""

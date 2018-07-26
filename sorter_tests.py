@@ -4,6 +4,7 @@ import re
 import os
 import tempfile
 from random import randint
+import main
 
 
 class TestMakeRegexpForSplit(unittest.TestCase):
@@ -352,7 +353,7 @@ class TestCompareForMultisorting(unittest.TestCase):
         self.make_test(0, ["a_bz", "aaaa"])
         self.make_test(0, ["a_BZ", "aAAA"])
 
-    def all_test_with_reverse(self):
+    def test_with_reverse(self):
         self.sorter.is_reverse = True
         self.make_test(0, [""])
         self.make_test(0, ["a"])
@@ -363,8 +364,7 @@ class TestCompareForMultisorting(unittest.TestCase):
         self.make_test(0, ["a_b_c", "a_b", "a"])
         self.make_test(2, ["ab", "aa", "ad"])
         self.make_test(1, ["a_bz", "aaaa"])
-        self.make_test(0, ["A_bz", "a_zz"])
-        self.make_test(0, ["a_bz", "A_zz"])
+        self.make_test(1, ["a_bz", "A_zz"])
         self.sorter.is_reverse = False
 
 
