@@ -1,6 +1,5 @@
 import re
 import os
-import shutil
 import tempfile
 
 
@@ -13,13 +12,18 @@ class Sorter:
     some_regexp = None
     tmp_files_names = None
 
-    def __init__(self, input_file_name, separators, is_reverse=False,
-                 is_multisorting=True, column_for_sort=0,
-                 strings_in_tmp_file=4000):
+    def __init__(self,
+                 input_file_name,
+                 separators,
+                 is_reverse=False,
+                 is_multisorting=True,
+                 column_for_sort=0,
+                 strings_in_tmp_file=4000,
+                 path_tmp_dir=None):
         self.regexp_for_split = self.make_regexp_for_split(separators)
         self.path_input_file = os.getcwd()
         self.input_file_name = input_file_name
-        self.path_tmp_dir = self.make_tmp_dir()
+        self.path_tmp_dir = self.make_tmp_dir(path_tmp_dir)
         self.is_reverse = is_reverse
         self.is_multisorting = is_multisorting
         self.column_for_sort = column_for_sort - 1
@@ -70,9 +74,16 @@ class Sorter:
         return re.compile(result)
 
     @staticmethod
-    def make_tmp_dir():
+    def make_tmp_dir(temp_dir):
         """Создаёт временную директорию и возвращает путь к ней"""
-        return tempfile.mkdtemp()
+        if temp_dir is None:
+            return tempfile.mkdtemp()
+        else:
+            try:
+                os.stat(temp_dir)
+            except IOError:
+                os.mkdir(temp_dir)
+            return os.getcwd() + '/' + temp_dir
 
     def split_file_into_sorted_tmp_files(self):
         """Отправляет во временую директорию отсортированные фрагменты
@@ -288,4 +299,6 @@ class Sorter:
 
     def delete_tmp_dir(self):
         """Удаляет временную директорию"""
-        shutil.rmtree(self.path_tmp_dir)
+        path = os.path.join(self.path_tmp_dir, self.tmp_files_names[0])
+        os.remove(path)
+        os.rmdir(self.path_tmp_dir)

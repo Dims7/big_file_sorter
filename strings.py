@@ -5,5 +5,6 @@ HELP_REVERSE = "Reverse Sorting"
 HELP_COLUMN = "Column for sorting. Using this argument disables " \
               "multisorting and enables stable sorting"
 HELP_MAX_STRINGS = "Max strings in tmp file"
+HELP_TMP_PATH = "Folder for temporary files storage"
 
 ERROR_CANT_FIND_FILE = "Can`t find filename in arguments"

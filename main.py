@@ -1,14 +1,11 @@
 # -*- coding: UTF-8 -*-
 
-from sys import argv
 from sorter import Sorter
 import argparse
 import strings
 
 
-# ToDo удаление без rmtree
 # ToDo прогрессбар
-# ToDo возможность указания временной директории
 # ToDo readme
 # ToDo тесты main.py
 
@@ -20,9 +17,11 @@ def create_parser():
                         default="")
     parser.add_argument('-r', '--reverse', action='store_const', const=True,
                         default=False, help=strings.HELP_REVERSE)
-    parser.add_argument('-c', '--column', type=int, help=strings.HELP_COLUMN)
+    parser.add_argument('-c', '--column', type=int, help=strings.HELP_COLUMN,
+                        default=0)
     parser.add_argument('-m', '--maxstrings', help=strings.HELP_MAX_STRINGS,
                         type=int, default=4000)
+    parser.add_argument('-t', '--tmppath', help=strings.HELP_TMP_PATH, default=None)
     return parser
 
 
@@ -33,8 +32,9 @@ def run():
     sorter = Sorter(input_file_name=namespace.filename,
                     separators=namespace.separators,
                     is_reverse=namespace.reverse,
-                    is_multisorting=namespace.column in None,
-                    column_for_sort=namespace.column)
+                    is_multisorting=namespace.column == 0,
+                    column_for_sort=namespace.column,
+                    path_tmp_dir=namespace.tmppath)
     sorter.sort()
 
 
