@@ -1,6 +1,7 @@
 import re
 import os
 import tempfile
+from progressbar_for_sorter import ProgressbarForSorter
 
 
 class Sorter:
@@ -11,6 +12,8 @@ class Sorter:
     is_reverse = None
     some_regexp = None
     tmp_files_names = None
+
+    bar = None
 
     def __init__(self,
                  input_file_name,
@@ -33,6 +36,8 @@ class Sorter:
         self.tmp_files_names = []
         self.tmp_file_counter = 0
         self.merging_in_one_step = 10
+        self.bar = ProgressbarForSorter(input_file_name, strings_in_tmp_file,
+                                        self.merging_in_one_step)
 
     def sort(self):
         self.split_file_into_sorted_tmp_files()
@@ -125,6 +130,7 @@ class Sorter:
     def sort_text(self, input_text):
         """Сортирует текст одним из методов:
         мультисортировка или стабильная сортирока"""
+        self.bar.update_for_sorter()
         if self.is_multisorting:
             return self.multisorting_text(input_text)
         return self.stable_sorting_text(input_text)
@@ -182,6 +188,7 @@ class Sorter:
                 [re.split(self.regexp_for_split, string.lower()), counter])
             counter += 1
         tmp_arr.sort(reverse=self.is_reverse)
+
         return tmp_arr[0][1]
 
     def compare_for_stable_sorting(self, strings):
@@ -201,20 +208,21 @@ class Sorter:
     def compare_strings(self, strings):
         """Получает на вход массив строк и возвращает id наименьшей
         (если не включена реверсивная сортировка)"""
+        self.bar.update_for_compare()
         if self.is_multisorting:
             return self.compare_for_multisorting(strings)
         return self.compare_for_stable_sorting(strings)
 
     def merging_all_tmp_files(self):
         """Объединяет все временные файлы в результирующий"""
-        while (len(self.tmp_files_names) != 1):
-            count_of_merging = self.merging_in_one_step
-            if count_of_merging > len(self.tmp_files_names):
-                count_of_merging = len(self.tmp_files_names)
+        while len(self.tmp_files_names) != 1:
+            count_of_merging = min(self.merging_in_one_step,
+                                   len(self.tmp_files_names))
             self.merging_any_tmp_files(count_of_merging)
 
     def merging_any_tmp_files(self, count_of_files):
         """Объединяет определённое число временных файлов в один"""
+
         os.chdir(self.path_tmp_dir)
         result_file = open(str(self.tmp_file_counter) + ".tmp", 'w')
         self.tmp_files_names.append(result_file.name)
@@ -261,6 +269,7 @@ class Sorter:
 
         result_file.close()
 
+
     def replace_input_file_with_result_file(self, result_file_name):
         """Перезаписывает исходный файл результирующим"""
         os.chdir(self.path_tmp_dir)
@@ -299,6 +308,7 @@ class Sorter:
 
     def delete_tmp_dir(self):
         """Удаляет временную директорию"""
-        path = os.path.join(self.path_tmp_dir, self.tmp_files_names[0])
-        os.remove(path)
+        while len(self.tmp_files_names) > 0:
+            path = os.path.join(self.path_tmp_dir, self.tmp_files_names.pop())
+            os.remove(path)
         os.rmdir(self.path_tmp_dir)

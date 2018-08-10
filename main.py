@@ -4,10 +4,7 @@ from sorter import Sorter
 import argparse
 import strings
 
-
-# ToDo прогрессбар
 # ToDo readme
-# ToDo тесты main.py
 
 def create_parser():
     parser = argparse.ArgumentParser()

@@ -6,6 +6,7 @@ import tempfile
 from random import randint
 import main
 
+# ToDo сделать тесты
 
 class TestMakeRegexpForSplit(unittest.TestCase):
 
@@ -35,12 +36,14 @@ class TestMakeRegexpForSplit(unittest.TestCase):
 class TestMakeAndDeleteTmpDir(unittest.TestCase):
     sorter = Sorter(separators='', input_file_name='')
 
+    #ToDo сделать тесты с конкретной директорией
+
     def test_all(self):
         self.create_tmp_dir_test()
         self.delete_tmp_dir_test()
 
     def create_tmp_dir_test(self):
-        self.sorter.make_tmp_dir()
+        self.sorter.make_tmp_dir(None)
         tmp_dir_name = re.split('[\\/]', self.sorter.path_tmp_dir)[
             len(re.split('[\\/]', self.sorter.path_tmp_dir)) - 1]
         self.assertTrue(tmp_dir_name in os.listdir(tempfile.gettempdir()))
