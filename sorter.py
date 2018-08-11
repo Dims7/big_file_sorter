@@ -13,6 +13,7 @@ class Sorter:
     some_regexp = None
     tmp_files_names = None
 
+    is_bar_need = None
     bar = None
 
     def __init__(self,
@@ -22,7 +23,8 @@ class Sorter:
                  is_multisorting=True,
                  column_for_sort=0,
                  strings_in_tmp_file=4000,
-                 path_tmp_dir=None):
+                 path_tmp_dir=None,
+                 is_bar_need = True):
         self.regexp_for_split = self.make_regexp_for_split(separators)
         self.path_input_file = os.getcwd()
         self.input_file_name = input_file_name
@@ -36,8 +38,10 @@ class Sorter:
         self.tmp_files_names = []
         self.tmp_file_counter = 0
         self.merging_in_one_step = 10
-        self.bar = ProgressbarForSorter(input_file_name, strings_in_tmp_file,
-                                        self.merging_in_one_step)
+        self.is_bar_need = is_bar_need
+        if self.is_bar_need:
+            self.bar = ProgressbarForSorter(input_file_name, strings_in_tmp_file,
+                                            self.merging_in_one_step)
 
     def sort(self):
         self.split_file_into_sorted_tmp_files()
@@ -130,7 +134,8 @@ class Sorter:
     def sort_text(self, input_text):
         """Сортирует текст одним из методов:
         мультисортировка или стабильная сортирока"""
-        self.bar.update_for_sorter()
+        if self.is_bar_need:
+            self.bar.update_for_sorter()
         if self.is_multisorting:
             return self.multisorting_text(input_text)
         return self.stable_sorting_text(input_text)
@@ -208,7 +213,8 @@ class Sorter:
     def compare_strings(self, strings):
         """Получает на вход массив строк и возвращает id наименьшей
         (если не включена реверсивная сортировка)"""
-        self.bar.update_for_compare()
+        if self.is_bar_need:
+            self.bar.update_for_compare()
         if self.is_multisorting:
             return self.compare_for_multisorting(strings)
         return self.compare_for_stable_sorting(strings)

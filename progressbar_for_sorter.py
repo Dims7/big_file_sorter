@@ -13,7 +13,7 @@ class ProgressbarForSorter:
     counter = 0
 
     def get_max_value(self):
-        return sum(self.list_with_merge_costs) + sum(self.list_with_sort_costs)
+        return sum(self.list_with_merge_costs) + sum(self.list_with_sort_costs) // 2
 
     def fill_tmp_list(self, strings_count, strings_in_tmp_file):
         while strings_count != 0:
@@ -44,14 +44,14 @@ class ProgressbarForSorter:
         self.fill_tmp_list(strings_count, strings_in_one_step)
         self.fill_list_with_update_costs(merging_in_one_step)
         max_value = self.get_max_value()
-        self.bar = progressbar.ProgressBar(max_value=max_value)
+        self.bar = progressbar.ProgressBar(max_value=max_value, prefix="Sorting: ")
 
     def update_for_compare(self):
         self.current_value += 1
         self.bar.update(self.current_value)
 
     def update_for_sorter(self):
-        self.current_value += self.list_with_sort_costs.pop(0)
+        self.current_value += self.list_with_sort_costs.pop(0) // 2
         self.bar.update(self.current_value)
 
     @staticmethod

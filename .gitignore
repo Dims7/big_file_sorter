@@ -1,3 +1,10 @@
 .idea/
 __pycache__/
 test.py
+.coverage
+htmlcov/
+1000.txt
+10000.txt
+100000.txt
+500000.txt
+million.txt

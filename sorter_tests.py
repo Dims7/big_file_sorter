@@ -5,13 +5,14 @@ import os
 import tempfile
 from random import randint
 import main
+import progressbar_for_sorter
 
 # ToDo сделать тесты
 
 class TestMakeRegexpForSplit(unittest.TestCase):
 
     def make_assert(self, separators, need_to_compile):
-        sorter = Sorter(separators=separators, input_file_name='')
+        sorter = Sorter(separators=separators, input_file_name='', is_bar_need=False)
         self.assertEqual(
             re.compile(need_to_compile),
             sorter.regexp_for_split)
@@ -34,7 +35,7 @@ class TestMakeRegexpForSplit(unittest.TestCase):
 
 
 class TestMakeAndDeleteTmpDir(unittest.TestCase):
-    sorter = Sorter(separators='', input_file_name='')
+    sorter = Sorter(separators='', input_file_name='', is_bar_need=False)
 
     #ToDo сделать тесты с конкретной директорией
 
@@ -44,22 +45,22 @@ class TestMakeAndDeleteTmpDir(unittest.TestCase):
 
     def create_tmp_dir_test(self):
         self.sorter.make_tmp_dir(None)
-        tmp_dir_name = re.split('[\\/]', self.sorter.path_tmp_dir)[
-            len(re.split('[\\/]', self.sorter.path_tmp_dir)) - 1]
+        tmp_dir_name = re.split('[\\\|/]', self.sorter.path_tmp_dir)[
+            len(re.split('[\\\|/]', self.sorter.path_tmp_dir)) - 1]
         self.assertTrue(tmp_dir_name in os.listdir(tempfile.gettempdir()))
 
     def delete_tmp_dir_test(self):
         self.sorter.delete_tmp_dir()
-        tmp_dir_name = re.split('[\\/]', self.sorter.path_tmp_dir)[
-            len(re.split('[\\/]', self.sorter.path_tmp_dir)) - 1]
+        tmp_dir_name = re.split('[\\\|/]', self.sorter.path_tmp_dir)[
+            len(re.split('[\\\|/]', self.sorter.path_tmp_dir)) - 1]
         self.assertFalse(
             tmp_dir_name in os.listdir(tempfile.gettempdir()))
 
 
 class TestMultisortingTest(unittest.TestCase):
-    sorter = Sorter(input_file_name='', separators='_')
+    sorter = Sorter(input_file_name='', separators='_', is_bar_need=False)
     sorter_reverse = Sorter(input_file_name='', separators='_',
-                            is_reverse=True)
+                            is_reverse=True, is_bar_need=False)
 
     def test_empty_test(self):
         self.assertEqual(
@@ -128,10 +129,10 @@ class TestGetSomeSeparator(unittest.TestCase):
 
 class TestStableSortingTest(unittest.TestCase):
     sorter = Sorter(separators='_', is_multisorting=False, column_for_sort=2,
-                    input_file_name="")
+                    input_file_name="", is_bar_need=False)
     sorter_reverse = Sorter(separators='_', is_reverse=True,
                             is_multisorting=False, column_for_sort=2,
-                            input_file_name="")
+                            input_file_name="", is_bar_need=False)
 
     def refresh_sorters(self):
         self.sorter.string_counter = 0
@@ -175,13 +176,13 @@ class TestStableSortingTest(unittest.TestCase):
 
 class TestSortText(unittest.TestCase):
     multisorter = Sorter(input_file_name="", is_reverse=False,
-                         is_multisorting=True, separators="_")
+                         is_multisorting=True, separators="_", is_bar_need=False)
     stable_sorter1 = Sorter(input_file_name="", is_reverse=False,
                             is_multisorting=False, separators="_",
-                            column_for_sort=2)
+                            column_for_sort=2, is_bar_need=False)
     stable_sorter2 = Sorter(input_file_name="", is_reverse=False,
                             is_multisorting=False, separators="_",
-                            column_for_sort=2)
+                            column_for_sort=2, is_bar_need=False)
 
     def refresh_sorter(self):
         self.stable_sorter1.string_counter = 0
@@ -236,7 +237,7 @@ class TestSplitFileIntoSortedTmpFiles(unittest.TestCase):
 
     def test_empty_file(self):
         self.create_file_for_check("")
-        sorter = Sorter(input_file_name="test.txt", separators="_")
+        sorter = Sorter(input_file_name="test.txt", separators="_", is_bar_need=False)
         sorter.split_file_into_sorted_tmp_files()
         os.chdir(sorter.path_tmp_dir)
         tmp_file_0 = open("0.tmp", "r")
@@ -245,9 +246,9 @@ class TestSplitFileIntoSortedTmpFiles(unittest.TestCase):
 
     def test_file_with_single_string(self):
         self.create_file_for_check("1_2_345_a")
-        multisorter = Sorter(input_file_name="test.txt", separators="_")
+        multisorter = Sorter(input_file_name="test.txt", separators="_", is_bar_need=False)
         stable_sorter = Sorter(input_file_name="test.txt", separators="_",
-                               is_multisorting=False, column_for_sort=2)
+                               is_multisorting=False, column_for_sort=2, is_bar_need=False)
 
         multisorter.split_file_into_sorted_tmp_files()
         os.chdir(multisorter.path_tmp_dir)
@@ -264,10 +265,10 @@ class TestSplitFileIntoSortedTmpFiles(unittest.TestCase):
     def test_file_with_3_string(self):
         self.create_file_for_check("aaa_ccc_bbb\nccc_bbb_aaa\nbbb_ccc_aaa")
         multisorter = Sorter(input_file_name="test.txt", separators="_",
-                             strings_in_tmp_file=1)
+                             strings_in_tmp_file=1, is_bar_need=False)
         stable_sorter = Sorter(input_file_name="test.txt", separators="_",
                                is_multisorting=False, column_for_sort=2,
-                               strings_in_tmp_file=1)
+                               strings_in_tmp_file=1, is_bar_need=False)
 
         multisorter.split_file_into_sorted_tmp_files()
         os.chdir(multisorter.path_tmp_dir)
@@ -301,10 +302,10 @@ class TestSplitFileIntoSortedTmpFiles(unittest.TestCase):
         self.create_file_for_check(
             "ccc_bbb_aaa\naaa_ccc_bbb\nbbb_ccc_aaa\naaa_bbb_ccc")
         multisorter = Sorter(input_file_name="test.txt", separators="_",
-                             strings_in_tmp_file=2)
+                             strings_in_tmp_file=2, is_bar_need=False)
         stable_sorter = Sorter(input_file_name="test.txt", separators="_",
                                is_multisorting=False, column_for_sort=2,
-                               strings_in_tmp_file=2)
+                               strings_in_tmp_file=2, is_bar_need=False)
 
         multisorter.split_file_into_sorted_tmp_files()
         os.chdir(multisorter.path_tmp_dir)
@@ -332,7 +333,7 @@ class TestSplitFileIntoSortedTmpFiles(unittest.TestCase):
 
 
 class TestCompareForMultisorting(unittest.TestCase):
-    sorter = Sorter(input_file_name="", separators="_")
+    sorter = Sorter(input_file_name="", separators="_", is_bar_need=False)
 
     def make_test(self, result, strings):
         self.assertEqual(
@@ -373,7 +374,7 @@ class TestCompareForMultisorting(unittest.TestCase):
 
 class TestCompareForStableSorting(unittest.TestCase):
     sorter = Sorter(input_file_name="", separators="_", is_multisorting=False,
-                    column_for_sort=2)
+                    column_for_sort=2, is_bar_need=False)
 
     def make_test(self, result, strings):
         self.assertEqual(
@@ -412,9 +413,9 @@ class TestCompareForStableSorting(unittest.TestCase):
 
 
 class TestCompareStrings(unittest.TestCase):
-    multisorter = Sorter(input_file_name="", separators="_")
+    multisorter = Sorter(input_file_name="", separators="_", is_bar_need=False)
     stable_sorter = Sorter(input_file_name="", separators="_",
-                           is_multisorting=False, column_for_sort=2)
+                           is_multisorting=False, column_for_sort=2, is_bar_need=False)
 
     def make_test_multisorting(self, strings):
         self.assertEqual(
@@ -489,7 +490,7 @@ class TestMergingAnyFiles(unittest.TestCase):
     def make_test(self, texts, count_of_merging, result, reverse=False,
                   multisorting=True):
         sorter = Sorter(input_file_name="", separators="_", is_reverse=reverse,
-                        is_multisorting=multisorting, column_for_sort=2)
+                        is_multisorting=multisorting, column_for_sort=2, is_bar_need=False)
         self.prepare_to_check(sorter, texts)
         tmp_files_counter = sorter.tmp_file_counter
         sorter.merging_any_tmp_files(count_of_merging)
@@ -553,7 +554,7 @@ class TestPrepareStableSortingFileToReplace(unittest.TestCase):
         tmp_file.write(text)
         tmp_file.close()
         sorter = Sorter(input_file_name="", separators="_",
-                        is_multisorting=False, column_for_sort=2)
+                        is_multisorting=False, column_for_sort=2, is_bar_need=False)
         sorter.path_tmp_dir = tmp_dir
         sorter.prepare_stable_sorting_file_to_replace("4.tmp")
         tmp_file = open("4.tmp", "r")
@@ -582,7 +583,7 @@ class TestReplaceInputFileWithResultFile(unittest.TestCase):
         tmp_file.write(text)
         tmp_file.close()
         sorter = Sorter(input_file_name="wow.txt", separators="_",
-                        is_multisorting=False, column_for_sort=2)
+                        is_multisorting=False, column_for_sort=2, is_bar_need=False)
         sorter.path_tmp_dir = tmp_dir
         sorter.replace_input_file_with_result_file("4.tmp")
         sorter.path_input_file = tmp_dir
@@ -603,7 +604,7 @@ class TestReplaceInputFileWithResultFile(unittest.TestCase):
 
 class TestMergingAllTmpFiles(unittest.TestCase):
     def do_tests(self, texts, result):
-        sorter = Sorter(input_file_name="", separators="_")
+        sorter = Sorter(input_file_name="", separators="_", is_bar_need=False)
         tmp_dir = tempfile.mkdtemp()
         os.chdir(tmp_dir)
         sorter.path_tmp_dir = tmp_dir
@@ -668,7 +669,7 @@ class TestSort(unittest.TestCase):
         tmp_dir = tempfile.mkdtemp()
         os.chdir(tmp_dir)
         self.create_random_file("test.txt", 5000, 30)
-        sorter = Sorter(input_file_name="test.txt", separators=" ")
+        sorter = Sorter(input_file_name="test.txt", separators=" ", is_bar_need=False)
         sorter.strings_in_tmp_file = 50
         sorter.sort()
         result_file = open("test.txt", 'r')
@@ -687,3 +688,4 @@ class TestSort(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
