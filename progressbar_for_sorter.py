@@ -1,7 +1,6 @@
 import progressbar
 
 
-# ToDo оптимизировать код
 class ProgressbarForSorter:
     current_value = None
     bar = None
@@ -13,7 +12,7 @@ class ProgressbarForSorter:
     counter = 0
 
     def get_max_value(self):
-        return sum(self.list_with_merge_costs) + sum(self.list_with_sort_costs) // 2
+        return sum(self.list_with_merge_costs) + sum(self.list_with_sort_costs) // 3
 
     def fill_tmp_list(self, strings_count, strings_in_tmp_file):
         while strings_count != 0:
@@ -51,7 +50,7 @@ class ProgressbarForSorter:
         self.bar.update(self.current_value)
 
     def update_for_sorter(self):
-        self.current_value += self.list_with_sort_costs.pop(0) // 2
+        self.current_value += self.list_with_sort_costs.pop(0) // 3
         self.bar.update(self.current_value)
 
     @staticmethod

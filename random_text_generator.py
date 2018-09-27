@@ -21,3 +21,7 @@ class RandomTextGenerator:
                 string = string[:-len(separator)] + '\n'
                 f.write(string)
         print("Generating complete.")
+
+if __name__ == '__main__':
+    generator = RandomTextGenerator()
+    generator.generate_random_text('forTest.txt', 10, 150000, ' ')
